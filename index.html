@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Void Dev - Integrated System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <!-- Menghubungkan ke file CSS external -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="modal-overlay" id="usernameModal">
+        <div class="modal-box">
+            <i class="fa-solid fa-user-astronaut"></i>
+            <h2>Selamat Datang</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">Silakan masukkan username Anda untuk mengakses sistem Void Dev.</p>
+            <input type="text" class="input-void" id="popupUsernameField" placeholder="Ketik nama anda..." style="margin-bottom:15px;">
+            <button class="btn-void" onclick="submitUsername()">Masuk Aplikasi</button>
+        </div>
+    </div>
+
+    <div class="android-layer">
+        
+        <div class="app-header" id="mainHeader">
+            <h1>VOID DEV</h1>
+            <p>Sistem Hubungan Client & Admin Real-time</p>
+        </div>
+
+        <div class="user-welcome-bar" id="welcomeBar" style="display:none;">
+            <span><i class="fa-solid fa-circle-user"></i> Pengguna: <b id="activeUserLabel">Guest</b></span>
+            <span style="font-size:0.7rem; opacity:0.6;"><i class="fa-solid fa-circle" style="color:var(--success-color)"></i> Online</span>
+        </div>
+
+        <div class="panel-content">
+            
+            <div id="userLayoutView" style="display:none; flex-direction:column; gap:20px;">
+                <div class="void-card">
+                    <div class="card-title"><i class="fa-solid fa-paper-plane"></i> Mulai Obrolan Baru</div>
+                    <div class="form-group">
+                        <label>Email Hubungan</label>
+                        <input type="email" class="input-void" id="userEmail" placeholder="emailanda@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori Masalah</label>
+                        <select class="input-void" id="reportType">
+                            <option value="Laporan">Laporan Bug / Kendala</option>
+                            <option value="Request">Request Fitur / Project</option>
+                            <option value="Tanya">Pertanyaan Umum</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pesan Pertama</label>
+                        <textarea class="input-void" id="userMessage" rows="3" placeholder="Ketik deskripsi awal..."></textarea>
+                    </div>
+                    <button class="btn-void" onclick="submitNewReport()">Kirim Tiket Chat</button>
+
+                    <div class="token-success-box" id="tokenBox">
+                        <p style="font-size: 0.8rem;">Tiket Dibuat! Simpan Token Anda:</p>
+                        <div class="token-code" id="displayTokenCode" onclick="copyUserToken()">VOID-XXXX</div>
+                        <p style="font-size: 0.7rem; color: var(--text-muted);">Gunakan token ini untuk masuk ruang obrolan kembali nanti.</p>
+                    </div>
+                </div>
+
+                <div class="void-card">
+                    <div class="card-title"><i class="fa-solid fa-comments"></i> Ruang Obrolan / Cek Token</div>
+                    <div class="input-group" style="display:flex; gap:8px; margin-bottom:14px;">
+                        <input type="text" class="input-void" id="searchTokenInput" placeholder="Masukkan Token (e.g. VOID-1234)">
+                        <button class="btn-void" style="width:auto; padding:0 16px;" onclick="trackReportByToken()">Masuk</button>
+                    </div>
+
+                    <div id="userTrackingArea" style="display: none;">
+                        <div class="chat-thread-container" id="userChatContainer"></div>
+                        <div class="input-group" style="display:flex; gap:8px;">
+                            <input type="text" class="input-void" id="userReplyText" placeholder="Ketik balasan bebas...">
+                            <button class="btn-void" style="width:auto; padding:0 18px;" onclick="sendReplyFromUser()"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="adminLayoutView" style="display:none; flex-direction:column; gap:20px;">
+                <div class="void-card">
+                    <div class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Antrean Tiket Chat</div>
+                    <div class="ticket-list" id="adminTicketList">
+                        <p style="font-size:0.8rem; text-align:center; color:var(--text-muted);">Menunggu tiket chat masuk...</p>
+                    </div>
+                </div>
+
+                <div class="void-card" id="adminChatCard" style="display:none;">
+                    <div class="card-title" id="adminActiveTitle"><i class="fa-solid fa-comments"></i> Obrolan Terpilih</div>
+                    <div class="chat-thread-container" id="adminChatContainer"></div>
+                    
+                    <div class="input-group" style="display:flex; gap:8px;">
+                        <input type="text" class="input-void" id="adminReplyText" placeholder="Ketik balasan admin manual...">
+                        <button class="btn-void" style="width:auto; padding:0 18px;" onclick="sendReplyFromAdmin()"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="toast" id="voidToast">Berhasil!</div>
+
+    <!-- Menghubungkan ke file JS external -->
+    <script src="script.js"></script>
+</body>
+</html>
